@@ -22,3 +22,4 @@ jobs:
 
       - name: Build completo
         run: mvn clean verify
+        working-directory: transacao-simplificada
