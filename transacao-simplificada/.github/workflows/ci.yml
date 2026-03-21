@@ -1,0 +1,37 @@
+name: CI - Transacao Simplificada
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17' # ajuste se estiver usando outra versão
+
+      - name: Cache do Maven
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-
+
+      - name: Instalar dependências
+        run: mvn clean install -DskipTests
+
+      - name: Rodar Lint (checkstyle)
+        run: mvn checkstyle:check || true
+
+      - name: Rodar Testes
+        run: mvn test
