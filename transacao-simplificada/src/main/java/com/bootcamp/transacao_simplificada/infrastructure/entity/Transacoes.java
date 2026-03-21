@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -30,4 +31,11 @@ public class Transacoes {
     @JoinColumn( name = "pagador_id" )
     @ManyToOne
     private Usuario pagador;
+    private LocalDateTime dataHoraTransacao;
+
+
+    @PrePersist
+    void prePersist() {
+        dataHoraTransacao = LocalDateTime.now();
+    }
 }
