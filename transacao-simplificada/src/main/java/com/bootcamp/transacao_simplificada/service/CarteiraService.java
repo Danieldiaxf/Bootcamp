@@ -1,9 +1,7 @@
 package com.bootcamp.transacao_simplificada.service;
 
 import com.bootcamp.transacao_simplificada.infrastructure.entity.Carteira;
-import com.bootcamp.transacao_simplificada.infrastructure.entity.Usuario;
-import com.bootcamp.transacao_simplificada.infrastructure.exceptions.UserNotFound;
-import com.bootcamp.transacao_simplificada.infrastructure.repository.UsuarioRepository;
+import com.bootcamp.transacao_simplificada.infrastructure.repository.CarteiraRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,9 +9,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CarteiraService {
 
-    private final carteiraRepository repository;
+    private final CarteiraRepository repository;
 
-    public void salvar( Carteira carteira ) {
+    public Carteira salvar(Carteira carteira ) {
         return repository.save( carteira );
     }
 }
