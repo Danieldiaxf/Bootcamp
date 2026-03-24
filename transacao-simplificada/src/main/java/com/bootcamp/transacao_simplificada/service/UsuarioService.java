@@ -12,10 +12,9 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
 
-    public Usuario buscarUsuario( Long id ) {
-        return repository.findById( id )
-                .orElseThrow( ( ) ->
-                        new UserNotFound( "Usuario nao encontrado" ) );
+    public Usuario buscarUsuario(Long id){
+        return repository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFound("Usuário não encontrado"));
     }
-
 }
