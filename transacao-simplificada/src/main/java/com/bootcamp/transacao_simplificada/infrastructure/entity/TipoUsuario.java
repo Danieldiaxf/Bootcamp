@@ -4,6 +4,4 @@ public enum TipoUsuario {
 
     COMUM,
     LOJISTA
-
-
 }

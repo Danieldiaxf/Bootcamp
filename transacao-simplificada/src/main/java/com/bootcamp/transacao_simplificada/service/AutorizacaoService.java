@@ -12,9 +12,8 @@ public class AutorizacaoService {
 
     private final AutorizacaoClient client;
 
-    public boolean validarTransferencia(  ) {
-
-        if (Objects.equals( client.validarAutorizacao( ).data( ).autorization( ), "true" ) ) {
+    public boolean validarTransferencia(){
+        if(Objects.equals(client.validarAutorizacao().data().authorization(), "true")){
             return true;
         }
         return false;

@@ -6,23 +6,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler( IllegalAccessException.class )
-    public ResponseEntity<String> handleIllegalAccessException( IllegalAccessException e ) {
-        return new ResponseEntity<>( "erro" + e.getMessage(), HttpStatus.BAD_REQUEST );
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handeIllegalArgumentException(IllegalArgumentException e){
+        return new ResponseEntity<>("Erro: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler( BadRequestException.class )
-    public ResponseEntity<String> handleBadRequestException( BadRequestException e ) {
-        return new ResponseEntity<>( "erro" + e.getMessage(), HttpStatus.BAD_REQUEST );
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handeBadRequestException(BadRequestException e){
+        return new ResponseEntity<>("Erro: " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler( UserNotFound.class )
-    public ResponseEntity<String> handeUserNotFoundException( UserNotFound e ) {
-        return new ResponseEntity<>( "erro" + e.getMessage(), HttpStatus.NOT_FOUND );
+    @ExceptionHandler(UserNotFound.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFound e){
+        return new ResponseEntity<>("Erro: " + e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
 }

@@ -13,7 +13,7 @@ public class NotificacaoService {
 
     private final NotificacaoClient client;
 
-    public void enviarNotificacao(  ) {
+    public void enviarNotificacao(){
         client.enviarNotificacao();
     }
 }

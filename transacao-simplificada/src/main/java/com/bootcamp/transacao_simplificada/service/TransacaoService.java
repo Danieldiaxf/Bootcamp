@@ -25,71 +25,68 @@ public class TransacaoService {
     private final NotificacaoService notificacaoService;
 
     @Transactional
-    public void transferirValores( TransacaoDTO transacaoDTO ) {
-        Usuario pagador = usuarioService.buscarUsuario( transacaoDTO.payer( ) );
-        Usuario recebedor = usuarioService.buscarUsuario(transacaoDTO.payee( ) );
+    public void transferirValores(TransacaoDTO transacaoDTO) {
+        Usuario pagador = usuarioService.buscarUsuario(transacaoDTO.payer());
+        Usuario recebedor = usuarioService.buscarUsuario(transacaoDTO.payee());
 
-        validaPagadorLojista( pagador );
-        validarSaldoUsuario( pagador, transacaoDTO.value( ) );
+        validaPagadorLojista(pagador);
+        validarSaldoUsuario(pagador, transacaoDTO.value());
         validarTransferencia();
 
-
-        pagador.getCarteira().setSaldo( pagador.getCarteira().getSaldo( ).subtract( transacaoDTO.value( ) ) );
-        atualiarSaldoCarteira( pagador.getCarteira( ) );
-        recebedor.getCarteira().setSaldo( pagador.getCarteira().getSaldo( ).add( transacaoDTO.value( ) ) );
-        atualiarSaldoCarteira( recebedor.getCarteira( ) );
-
+        pagador.getCarteira().setSaldo(pagador.getCarteira().getSaldo().subtract(transacaoDTO.value()));
+        atualizarSaldoCarteira(pagador.getCarteira());
+        recebedor.getCarteira().setSaldo(pagador.getCarteira().getSaldo().add(transacaoDTO.value()));
+        atualizarSaldoCarteira(recebedor.getCarteira());
 
         Transacoes transacoes = Transacoes.builder()
-                .valor( transacaoDTO.value( ) )
-                .pagador( pagador )
-                .recebedor( recebedor )
+                .valor(transacaoDTO.value())
+                .pagador(pagador)
+                .recebedor(recebedor)
                 .build();
 
-        repository.save( transacoes );
+        repository.save(transacoes);
         enviarNotificacao();
     }
 
-    private void validaPagadorLojista( Usuario usuario ) {
-        try{
-            if( usuario.getTipoUsuario( ).equals( TipoUsuario.LOJISTA ) ) {
-                throw new IllegalArgumentException( "Transacao nao autorizada para esse tipo de usuario" );
+    private void validaPagadorLojista(Usuario usuario) {
+        try {
+            if (usuario.getTipoUsuario().equals(TipoUsuario.LOJISTA)) {
+                throw new IllegalArgumentException("Transação não autorizada para esse tipo de usuario");
             }
-        } catch ( Exception e ) {
-            throw new IllegalArgumentException( e.getMessage( ) );
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 
-    private void validarSaldoUsuario( Usuario usuario, BigDecimal valor ) {
-       try{
-           if( usuario.getCarteira(  ).getSaldo(  ).compareTo( valor ) < 0 ) {
-                throw new IllegalArgumentException( "Trasacao nao autorizada! Saldo insuficiente!" );
-           }
-       } catch ( Exception e ) {
-           throw new IllegalArgumentException( e.getMessage( ) );
-       }
-    }
-
-    private void validarTransferencia(  ) {
-        try{
-            if( !autorizacaoService.validarTransferencia( ) ) {
-                throw new IllegalArgumentException( "Trasacao nao autorizada pela API!" );
+    private void validarSaldoUsuario(Usuario usuario, BigDecimal valor) {
+        try {
+            if (usuario.getCarteira().getSaldo().compareTo(valor) < 0) {
+                throw new IllegalArgumentException("Transação não autorizada, saldo insuficiente");
             }
-        } catch ( Exception e ) {
-            throw new IllegalArgumentException( e.getMessage( ) );
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 
-    public void atualiarSaldoCarteira(Carteira carteira) {
-        carteiraService.salvar( carteira );
+    private void validarTransferencia() {
+        try {
+            if (!autorizacaoService.validarTransferencia()) {
+                throw new IllegalArgumentException("Transação não autorizada pela api");
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
-    private void enviarNotificacao(  ) {
-        try{
-            notificacaoService.enviarNotificacao( );
+    private void atualizarSaldoCarteira(Carteira carteira) {
+        carteiraService.salvar(carteira);
+    }
 
-        } catch ( HttpClientErrorException e) {
-                throw new BadRequestException( "Erro ao enviar notificacao!!!" );
+    private void enviarNotificacao() {
+        try {
+            notificacaoService.enviarNotificacao();
+        } catch (HttpClientErrorException e) {
+            throw new BadRequestException("Erro ao enviar notificacao");
         }
     }
 
