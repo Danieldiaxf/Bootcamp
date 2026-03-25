@@ -1,4 +1,4 @@
-# 💸 Transação Simplificada
+# 💸 Transações
 
 API REST desenvolvida em **Java + Spring Boot** para simulação de transferências financeiras entre usuários, com regras de negócio, integração externa e persistência em banco de dados.
 
