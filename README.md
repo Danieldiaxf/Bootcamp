@@ -111,6 +111,12 @@ com.bootcamp.transacao_simplificada
 ```json
 "Erro interno no servidor"
 ```
+---
+
+## 🌐 API's Utilizadas
+
+* **GET** : https://util.devi.tools/api/v2/authorize
+* **POST** : https://util.devi.tools/api/v1/notify
 
 ---
 
@@ -125,6 +131,7 @@ com.bootcamp.transacao_simplificada
 
 ### ✔️ Notificação
 
+* API: https://util.devi.tools/api/v1/notify
 * Simula envio de notificação após transferência
 
 ---
