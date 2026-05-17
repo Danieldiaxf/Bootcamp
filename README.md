@@ -183,10 +183,96 @@ spring.jpa.show-sql=true
 
 ---
 
-## 🧪 Testes
+## 🧪 Testes Automatizados
 
-- Teste de contexto Spring Boot
-- Possibilidade de expansão para testes unitários e integração
+Os testes validam o fluxo de comunicação com o serviço externo de autorização **sem depender de internet**, usando **WireMock** para simular as respostas da API e **H2** como banco em memória.
+
+### 🛠️ Tecnologias utilizadas nos testes
+
+| Biblioteca | Função |
+|---|---|
+| JUnit 5 | Framework de testes |
+| WireMock | Simula a API externa de autorização |
+| H2 | Banco em memória (substitui PostgreSQL nos testes) |
+
+---
+
+### 📂 Localização do teste
+
+```
+src/test/java/com/bootcamp/transacao_simplificada/
+└── infrastructure/
+    └── clients/
+        └── AutorizacaoClientTest.java
+```
+
+---
+
+### ✅ Cenários cobertos
+
+| # | Cenário | Comportamento esperado |
+|---|---|---|
+| 1 | API externa **autoriza** a transação | Nenhuma exceção é lançada |
+| 2 | API externa **nega** a autorização | Lança `IllegalArgumentException` |
+| 3 | API externa retorna **erro 500** | Lança exceção (serviço indisponível) |
+
+---
+
+### ⚙️ Dependências necessárias
+
+Adicione no `pom.xml` dentro de `<dependencies>`:
+
+```xml
+<!-- WireMock: simula a API externa nos testes -->
+<dependency>
+    <groupId>com.github.tomakehurst</groupId>
+    <artifactId>wiremock-jre8-standalone</artifactId>
+    <version>2.35.0</version>
+    <scope>test</scope>
+</dependency>
+
+<!-- H2: banco em memória para os testes -->
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>test</scope>
+</dependency>
+```
+
+---
+
+### ▶️ Como executar os testes
+
+```bash
+./mvnw test
+```
+
+> No Windows: `mvnw.cmd test`
+
+Resultado esperado no terminal:
+
+```
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+```
+
+---
+
+### 🗂️ Perfil de teste
+
+Crie o arquivo `src/test/resources/application-test.properties` com o conteúdo abaixo para isolar o ambiente de teste:
+
+```properties
+# Aponta para o WireMock em vez da API real
+autorizacao.api.url=http://localhost:8089
+
+# Banco em memória — não precisa do PostgreSQL rodando
+spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create-drop
+```
 
 ---
 
@@ -229,8 +315,6 @@ Pipeline configurado com **GitHub Actions**:
 
 ### ✅ Pré-requisitos
 
-Antes de executar a aplicação, certifique-se de ter instalado em sua máquina:
-
 | Ferramenta | Versão mínima | Download |
 |---|---|---|
 | Java (JDK) | 17 | [https://adoptium.net](https://adoptium.net) |
@@ -238,34 +322,20 @@ Antes de executar a aplicação, certifique-se de ter instalado em sua máquina:
 | PostgreSQL | 13+ | [https://www.postgresql.org](https://www.postgresql.org) |
 | Git | qualquer | [https://git-scm.com](https://git-scm.com) |
 
-> 💡 Para testar os endpoints, você precisará de **curl** (já incluso no Linux/Mac) ou do **Postman** ([https://www.postman.com](https://www.postman.com)).
+> 💡 Para testar os endpoints, use **curl** ou **Postman** ([https://www.postman.com](https://www.postman.com)).
 
 ---
 
 ### 🗄️ Passo 1 — Configurar o banco de dados
 
-Antes de iniciar a aplicação, crie o banco de dados no PostgreSQL.
-
-Abra o terminal e acesse o PostgreSQL:
-
 ```bash
 psql -U postgres
 ```
 
-Dentro do prompt do PostgreSQL, execute:
-
 ```sql
 CREATE DATABASE transacao_db;
-```
-
-Confirme que o banco foi criado e saia:
-
-```sql
-\l
 \q
 ```
-
-> ⚠️ Certifique-se de que o usuário `postgres` tem a senha definida como `senha`, ou ajuste o arquivo `application.properties` com suas credenciais reais antes de prosseguir.
 
 ---
 
@@ -273,11 +343,6 @@ Confirme que o banco foi criado e saia:
 
 ```bash
 git clone https://github.com/Danieldiaxf/Bootcamp.git
-```
-
-Entre na pasta do projeto:
-
-```bash
 cd Bootcamp/transacao-simplificada
 ```
 
@@ -285,73 +350,47 @@ cd Bootcamp/transacao-simplificada
 
 ### ⚙️ Passo 3 — Configurar as credenciais do banco
 
-Abra o arquivo `src/main/resources/application.properties` e verifique (ou ajuste) as configurações:
+Abra `src/main/resources/application.properties` e ajuste se necessário:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/transacao_db
 spring.datasource.username=postgres
 spring.datasource.password=senha
-
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 ```
 
-> O `ddl-auto=update` faz com que o Spring crie automaticamente as tabelas no banco na primeira execução. Não é necessário rodar nenhum script SQL manualmente.
+> O `ddl-auto=update` cria as tabelas automaticamente na primeira execução.
 
 ---
 
-### 🚀 Passo 4 — Compilar e iniciar a aplicação
-
-Execute o comando abaixo na raiz do módulo (`transacao-simplificada/`):
+### 🚀 Passo 4 — Iniciar a aplicação
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-> No Windows, use `mvnw.cmd spring-boot:run` em vez de `./mvnw spring-boot:run`.
+> No Windows: `mvnw.cmd spring-boot:run`
 
-Aguarde até ver no terminal uma mensagem semelhante a:
+Aguarde a mensagem:
 
 ```
-Started TransacaoSimplificadaApplication in 3.2 seconds (JVM running for 3.8)
+Started TransacaoSimplificadaApplication in 3.2 seconds
 ```
-
-Isso indica que a aplicação está **rodando e pronta para receber requisições** na porta `8080`.
 
 ---
 
-### 🔌 Passo 5 — Verificar se a aplicação está no ar
-
-Abra um novo terminal e execute:
+### 🔌 Passo 5 — Verificar se está no ar
 
 ```bash
 curl http://localhost:8080
 ```
 
-Se a aplicação estiver rodando, você receberá uma resposta (mesmo que seja um erro 404 — isso é esperado, pois não há endpoint raiz).
-
 ---
 
-## 🧪 Como Realizar uma Transação
+## 💸 Como Realizar uma Transação
 
-A interação com a API é feita via requisições HTTP. Os exemplos abaixo usam **curl**, mas você pode usar o Postman, Insomnia ou qualquer cliente HTTP.
-
----
-
-### 📋 Cenário de exemplo
-
-Imagine dois usuários já cadastrados no banco:
-
-| id | Nome | Tipo | Saldo |
-|---|---|---|---|
-| 1 | João Silva | COMUM | R$ 500,00 |
-| 2 | Loja do Zé | LOJISTA | R$ 0,00 |
-
----
-
-### 💸 Realizar uma transferência
-
-**João (id 1) transfere R$ 200,00 para a Loja do Zé (id 2):**
+### Transferência bem-sucedida
 
 ```bash
 curl -X POST http://localhost:8080/transfer \
@@ -363,17 +402,11 @@ curl -X POST http://localhost:8080/transfer \
   }'
 ```
 
-**Resposta esperada (sucesso):**
-
-```
-"Transacao realizada com sucesso"
-```
+**Resposta:** `"Transacao realizada com sucesso"`
 
 ---
 
-### ❌ Tentativas que resultam em erro
-
-**1. Lojista tentando enviar dinheiro (não permitido):**
+### ❌ Lojista tentando enviar (bloqueado)
 
 ```bash
 curl -X POST http://localhost:8080/transfer \
@@ -385,16 +418,11 @@ curl -X POST http://localhost:8080/transfer \
   }'
 ```
 
-**Resposta esperada:**
-
-```
-HTTP 400 Bad Request
-"Lojistas nao podem realizar transferencias"
-```
+**Resposta:** `HTTP 400 — "Lojistas nao podem realizar transferencias"`
 
 ---
 
-**2. Saldo insuficiente:**
+### ❌ Saldo insuficiente
 
 ```bash
 curl -X POST http://localhost:8080/transfer \
@@ -406,53 +434,7 @@ curl -X POST http://localhost:8080/transfer \
   }'
 ```
 
-**Resposta esperada:**
-
-```
-HTTP 400 Bad Request
-"Saldo insuficiente"
-```
-
----
-
-**3. Transferência bloqueada pela API de autorização externa:**
-
-Quando a API externa `https://util.devi.tools/api/v2/authorize` retorna negativa, a transferência é cancelada.
-
-**Resposta esperada:**
-
-```
-HTTP 400 Bad Request
-"Transacao nao autorizada pela API!"
-```
-
----
-
-### 🔎 Dicas para testar com Postman
-
-1. Abra o Postman e clique em **New Request**
-2. Selecione o método **POST**
-3. Insira a URL: `http://localhost:8080/transfer`
-4. Vá na aba **Body** → selecione **raw** → escolha **JSON**
-5. Cole o corpo da requisição:
-
-```json
-{
-  "value": 200.0,
-  "payer": 1,
-  "payee": 2
-}
-```
-
-6. Clique em **Send** e observe a resposta
-
----
-
-### 📝 Observações importantes
-
-- Os IDs de `payer` e `payee` devem corresponder a usuários **existentes no banco de dados**. Caso contrário, a aplicação retornará um erro.
-- A API de autorização externa pode **simular falhas aleatórias** — se a transação não for autorizada, tente novamente.
-- O campo `value` deve ser um número positivo. Valores zerados ou negativos não são válidos.
+**Resposta:** `HTTP 400 — "Saldo insuficiente"`
 
 ---
 
