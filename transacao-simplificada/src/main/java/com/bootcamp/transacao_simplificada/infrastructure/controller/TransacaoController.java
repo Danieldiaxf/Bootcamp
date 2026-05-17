@@ -1,6 +1,6 @@
 package com.bootcamp.transacao_simplificada.infrastructure.controller;
 
-import com.bootcamp.transacao_simplificada.service.TransacaoService;
+import com.bootcamp.transacao_simplificada.infrastructure.service.TransacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

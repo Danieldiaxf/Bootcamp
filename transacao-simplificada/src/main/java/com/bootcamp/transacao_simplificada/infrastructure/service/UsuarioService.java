@@ -1,4 +1,4 @@
-package com.bootcamp.transacao_simplificada.service;
+package com.bootcamp.transacao_simplificada.infrastructure.service;
 
 import com.bootcamp.transacao_simplificada.infrastructure.entity.Usuario;
 import com.bootcamp.transacao_simplificada.infrastructure.exceptions.UserNotFound;

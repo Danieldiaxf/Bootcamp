@@ -1,4 +1,4 @@
-package com.bootcamp.transacao_simplificada.service;
+package com.bootcamp.transacao_simplificada.infrastructure.service;
 
 import com.bootcamp.transacao_simplificada.infrastructure.entity.Carteira;
 import com.bootcamp.transacao_simplificada.infrastructure.repository.CarteiraRepository;
