@@ -35,7 +35,7 @@ public class TransacaoService {
 
         pagador.getCarteira().setSaldo(pagador.getCarteira().getSaldo().subtract(transacaoDTO.value()));
         atualizarSaldoCarteira(pagador.getCarteira());
-        recebedor.getCarteira().setSaldo(pagador.getCarteira().getSaldo().add(transacaoDTO.value()));
+        recebedor.getCarteira().setSaldo(recebedor.getCarteira().getSaldo().add(transacaoDTO.value()));
         atualizarSaldoCarteira(recebedor.getCarteira());
 
         Transacoes transacoes = Transacoes.builder()
