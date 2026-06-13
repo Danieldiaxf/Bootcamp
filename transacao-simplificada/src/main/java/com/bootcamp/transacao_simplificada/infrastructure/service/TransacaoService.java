@@ -90,4 +90,11 @@ public class TransacaoService {
         }
     }
 
+    private void validarValorPositivo(BigDecimal valor) {
+        if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("O valor da transação deve ser maior que zero");
+        }
+    }
+
+
 }
