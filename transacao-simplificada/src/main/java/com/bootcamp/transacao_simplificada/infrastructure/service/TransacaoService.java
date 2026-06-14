@@ -13,10 +13,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class TransacaoService {
+
+
+    private static final BigDecimal LIMITE_DIARIO = new BigDecimal("1000.00");
 
     private final UsuarioService usuarioService;
     private final AutorizacaoService autorizacaoService;
@@ -31,10 +36,12 @@ public class TransacaoService {
 
         validaPagadorLojista(pagador);
         validarSaldoUsuario(pagador, transacaoDTO.value());
+        validarLimiteDiario(pagador, transacaoDTO.value());
         validarTransferencia();
 
         pagador.getCarteira().setSaldo(pagador.getCarteira().getSaldo().subtract(transacaoDTO.value()));
         atualizarSaldoCarteira(pagador.getCarteira());
+
         recebedor.getCarteira().setSaldo(recebedor.getCarteira().getSaldo().add(transacaoDTO.value()));
         atualizarSaldoCarteira(recebedor.getCarteira());
 
@@ -43,9 +50,20 @@ public class TransacaoService {
                 .pagador(pagador)
                 .recebedor(recebedor)
                 .build();
-
         repository.save(transacoes);
         enviarNotificacao();
+    }
+
+    private void validarLimiteDiario(Usuario pagador, BigDecimal valor) {
+        LocalDateTime inicioDia = LocalDate.now().atStartOfDay();
+        BigDecimal totalDoDia = repository.somarTransacoesDoDia(pagador, inicioDia);
+
+        if (totalDoDia.add(valor).compareTo(LIMITE_DIARIO) > 0) {
+            BigDecimal limiteRestante = LIMITE_DIARIO.subtract(totalDoDia);
+            throw new IllegalArgumentException(
+                    "Limite diário de transferência atingido. Limite restante: R$ " + limiteRestante
+            );
+        }
     }
 
     private void validaPagadorLojista(Usuario usuario) {
@@ -95,6 +113,4 @@ public class TransacaoService {
             throw new IllegalArgumentException("O valor da transação deve ser maior que zero");
         }
     }
-
-
 }
